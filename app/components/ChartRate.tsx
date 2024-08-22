@@ -1,22 +1,33 @@
-import { time } from "console";
-import { list } from "postcss";
-import { useEffect, useState } from "react";
-import { Chart, Doughnut, Line  } from 'react-chartjs-2';
+'use client'
+import { Chart as ChartJS, registerables } from 'chart.js';
+import { useEffect, useState } from 'react';
+import { Chart } from 'react-chartjs-2';
+import getData from '../utils/utils';
+ChartJS.register(...registerables);
 
-
-export default async function ChartRate(timestamp: any, rateUsd: any){
-    const data = {labels: timestamp,
+export default function ChartRate() {
+    const [data, setData] = useState(
+        {
+            labels: [],
             datasets: [
-                {label:  '# of Votes',
-                data: rateUsd,
-                borderWidth: 1
+                {
+                    label: 'BTC',
+                    data: [],
                 }
             ]
-    } 
-    
-    return(
+        }
+    )
 
-        <Line data= {data}/>
+    useEffect(() => {
+        const interval = setInterval(() => getData().then((res) => setData(res)), 1000);
+        return () => {
+            clearInterval(interval);
+        };
+    }, [])
+
+    return (
+
+        <Chart type='line' data={data} />
     )
 
 
